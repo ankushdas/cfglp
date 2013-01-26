@@ -206,7 +206,7 @@ procedure:
         int bb_num = $bbn;
         ast_List_Ptr ast_lp = $slist;
         
-        clean_Ast_List(ast_lp);
+        //clean_Ast_List(ast_lp);
         
         $$ = build_Procedure (name, bb_num, ast_lp, sym_lp, sym_gp);
         symtab_in_scope_P->deallocate_Sym_List(); 
@@ -418,10 +418,11 @@ exe_Stmt :
  		1. lhs has been declared or not  
  		2. lhs-rhs type matches or not
  		*/
- 		$$ = process_Asgn_Name_Expr(*$lhs, $rhs, yylineno, 1);
+ 		$$ = process_Asgn_Name_Expr(get_Var_Name(*$lhs), $rhs, yylineno, 0);
  	}	
  |  EXP_VAR[lhs] '=' expr[rhs] ';'
  	{
+ 		//change implementation
  		/* things to check:
  		1. lhs has been declared or not  
  		2. lhs-rhs type matches or not
@@ -443,10 +444,11 @@ expr :
  |  ARTIFICIAL_VAR[id]
  	{
         //things to check: extra_var declared or not
-        $$ = process_Expr_equals_Id(*$id, 1, yylineno);
+        $$ = process_Expr_equals_Id(get_Var_Name(*$id), 0, yylineno);
  	}	
  |  EXP_VAR[id]
  	{
+        //change implementation
         //things to check: extra_var declared or not
         $$ = process_Expr_equals_Id(*$id, 2, yylineno);
  	}	
@@ -588,46 +590,46 @@ ast_Ptr missing_Declaration_Error(bool lhs_d, string lhs_n, bool rhs_d, string r
 	return NULL; 
 }
 
-ast_Ptr process_Asgn_Name_Name(string lhs, string rhs, int line)
-{
+//ast_Ptr process_Asgn_Name_Name(string lhs, string rhs, int line)
+//{
 
-    ast_Ptr asgn;
+//    ast_Ptr asgn;
 
-    bool lhs_d = symtab_in_scope_P->declared_In_Visible_Scope(lhs, anywhere); 
-    bool rhs_d = symtab_in_scope_P->declared_In_Visible_Scope(rhs, anywhere); 
+//    bool lhs_d = symtab_in_scope_P->declared_In_Visible_Scope(lhs, anywhere); 
+//    bool rhs_d = symtab_in_scope_P->declared_In_Visible_Scope(rhs, anywhere); 
 
-    if (lhs_d && rhs_d)
-    {
-        ast_Ptr ast_l = new name_Ast(lhs);
-        ast_Ptr ast_r = new name_Ast(rhs);
-        asgn = new asgn_Ast(ast_l, ast_r, line);
-        asgn->type_Check(); 
-    }
-    else 
-        asgn = missing_Declaration_Error(lhs_d, lhs, rhs_d, rhs, line);
+//    if (lhs_d && rhs_d)
+//    {
+//        ast_Ptr ast_l = new name_Ast(lhs);
+//        ast_Ptr ast_r = new name_Ast(rhs);
+//        asgn = new asgn_Ast(ast_l, ast_r, line);
+//        asgn->type_Check(); 
+//    }
+//    else 
+//        asgn = missing_Declaration_Error(lhs_d, lhs, rhs_d, rhs, line);
 
-    return asgn;
-}
+//    return asgn;
+//}
 
-ast_Ptr process_Asgn_Name_Num(string lhs, int rhs, int line)
-{
+//ast_Ptr process_Asgn_Name_Num(string lhs, int rhs, int line)
+//{
 
-    ast_Ptr asgn = NULL;
+//    ast_Ptr asgn = NULL;
 
-    bool lhs_d = symtab_in_scope_P->declared_In_Visible_Scope(lhs, anywhere); 
+//    bool lhs_d = symtab_in_scope_P->declared_In_Visible_Scope(lhs, anywhere); 
 
-    if (lhs_d)
-    {
-        ast_Ptr ast_l = new name_Ast(lhs);
-        ast_Ptr ast_r = new num_Ast(rhs);
-        asgn = new asgn_Ast(ast_l, ast_r, line);
-        asgn->type_Check(); 
-    }
-    else 
-       asgn = missing_Declaration_Error(lhs_d, lhs, true, "dummy_string", line);
+//    if (lhs_d)
+//    {
+//        ast_Ptr ast_l = new name_Ast(lhs);
+//        ast_Ptr ast_r = new num_Ast(rhs);
+//        asgn = new asgn_Ast(ast_l, ast_r, line);
+//        asgn->type_Check(); 
+//    }
+//    else 
+//       asgn = missing_Declaration_Error(lhs_d, lhs, true, "dummy_string", line);
 
-    return asgn;
-}
+//    return asgn;
+//}
 
 
 /*
@@ -690,6 +692,7 @@ ast_Ptr process_Asgn_Name_Expr(string lhs, ast_Ptr rhs, int line, int arti_var)
 	    return NULL;
 	ast_Ptr asgn = NULL;
 	bool lhs_d;
+	sym_Entry_Ptr sym_ptr;
 	if(arti_var == 1)
 	    lhs_d = symtab_in_scope_P->declared_In_Visible_Scope(get_Var_Name(lhs), anywhere); 
 	else 
@@ -707,7 +710,10 @@ ast_Ptr process_Asgn_Name_Expr(string lhs, ast_Ptr rhs, int line, int arti_var)
                 ast_l = new name_Ast(get_Var_Name(lhs));
                 break;
             case 2:
-                ast_l = new exp_var_Ast(lhs);
+                //ast_l = new exp_var_Ast(lhs);
+                sym_ptr = symtab_in_scope_P->get_Sym_Entry(lhs);
+                sym_ptr->set_Sym_Entry_Ptr(rhs);
+                return NULL;
                 break;
             default:
                 CHECK_INVARIANT(false, "error at switch case for process_expr_equals_id\n")
@@ -729,6 +735,7 @@ ast_Ptr process_Expr_equals_Id(string id, int arti_var, int line)
     ast_Ptr asgn = NULL;
     
 	bool lhs_d;
+	sym_Entry_Ptr sym_ptr;
 	
 	lhs_d = (arti_var == 1) ? symtab_in_scope_P->declared_In_Visible_Scope(get_Var_Name(id), anywhere) : symtab_in_scope_P->declared_In_Visible_Scope(id, anywhere); 
     
@@ -744,7 +751,9 @@ ast_Ptr process_Expr_equals_Id(string id, int arti_var, int line)
                 asgn = new name_Ast(get_Var_Name(id));
                 break;
             case 2:
-                asgn = new exp_var_Ast(id);
+                //asgn = new exp_var_Ast(id);
+                sym_ptr = symtab_in_scope_P->get_Sym_Entry(id);
+                asgn = sym_ptr->get_Sym_Entry_Ptr();
                 break;
             default:
                 CHECK_INVARIANT(false, "switch case for process_expr_equals_id")  
@@ -756,18 +765,3 @@ ast_Ptr process_Expr_equals_Id(string id, int arti_var, int line)
 	return asgn;
 }
 
-
-//ast_Ptr process_typecast_Expr(ast_Ptr e, int line) 
-//{
-//    //things to check: e is float or not
-//    ast_Ptr asgn = NULL;
-//    stringstream mesg;
-//    mesg << "Type Mismatch in between LHS and RHS expression on line " << line << ".\n";
-//    if(e->get_Val_Type() == float_Num) 
-//    {
-//        asgn = e;
-//    }
-//    else
-//        report_Violation_of_Condition(SHOULD_NOT_REACH, mesg.str());
-//    return asgn;
-//}
