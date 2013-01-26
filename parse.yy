@@ -705,9 +705,17 @@ ast_Ptr process_Asgn_Name_Expr(string lhs, ast_Ptr rhs, int line, int arti_var)
         {
             case 0:
                 ast_l = new name_Ast(lhs);
+                if (rhs->get_Tree_Op() == name_Leaf)
+                {
+                	if (lhs == rhs->get_Name()) return NULL;
+                }
                 break;
             case 1:
                 ast_l = new name_Ast(get_Var_Name(lhs));
+                if (rhs->get_Tree_Op() == name_Leaf)
+                {
+                	if (lhs == rhs->get_Name()) return NULL;
+                }
                 break;
             case 2:
                 //ast_l = new exp_var_Ast(lhs);
