@@ -74,8 +74,8 @@ class ast_Node
     virtual value_Type get_Val_Type() ; 
     virtual entity_Type get_Entity_Type(); 
     virtual string get_Name() ; 
-    virtual int get_Num();
-    virtual double get_d_Num();
+//    virtual int get_Num();
+//    virtual double get_d_Num();
 
     /* Evaluation functions */
     virtual eval_Result evaluate() = 0;
@@ -157,22 +157,57 @@ class name_Ast: public ast_Node
 
 class num_Ast: public ast_Node
 {
+	public:
+	num_Ast() {}
+	~num_Ast() {}
+	
+	virtual value_Type get_Val_Type();
+    virtual string get_Name();
+    virtual eval_Result evaluate();
+    
+    virtual void print_Node(ostream* o);
+
+};
+
+class int_num_Ast: public num_Ast
+{
     int num;
   public:
-    num_Ast(int n);
-    ~num_Ast() {}
+    int_num_Ast(int n);
+    ~int_num_Ast() {}
 
     /* Common function required for many activities */
-    int get_Num();
+    int get_Num() { return num; }
 
     /* Evaluation functions */
+    eval_Result evaluate();
     value_Type get_Val_Type();
     string get_Name();
-    eval_Result evaluate();
 
     /* Other printing functions */
     void print_Node(ostream *p);
 };
+
+class float_num_Ast: public num_Ast
+{
+    double num;
+  public:
+    float_num_Ast(double n);
+    ~float_num_Ast() {}
+
+    /* Common function required for many activities */
+    double get_Num() { return num; }
+    
+    eval_Result evaluate();
+    value_Type get_Val_Type();
+    string get_Name();
+
+    /* Evaluation functions */
+
+    /* Other printing functions */
+    void print_Node(ostream *p);
+};
+
 
 class ret_Ast: public ast_Node
 {
@@ -256,24 +291,6 @@ class exp_var_Ast: public ast_Node
     void print_Node(ostream *p);
 };
 
-class float_num_Ast: public ast_Node
-{
-    double num;
-  public:
-    float_num_Ast(double n);
-    ~float_num_Ast() {}
-
-    /* Common function required for many activities */
-    double get_d_Num();
-
-    /* Evaluation functions */
-    value_Type get_Val_Type();
-    string get_Name();
-    eval_Result evaluate();
-
-    /* Other printing functions */
-    void print_Node(ostream *p);
-};
 
 class arith_Ast: public ast_Node
 {

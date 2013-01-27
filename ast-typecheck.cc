@@ -104,12 +104,12 @@ string name_Ast::get_Name()
     return sym_entry->get_Name();
 }
 
-value_Type num_Ast::get_Val_Type()
+value_Type int_num_Ast::get_Val_Type()
 {
     return int_Val;
 }
 
-string num_Ast::get_Name()
+string int_num_Ast::get_Name()
 {
     /* We simply return a printable version of the number */
 
@@ -145,6 +145,15 @@ sym_Entry_Ptr ast_Node::get_Sym_Entry()
      CHECK_INVARIANT(SHOULD_NOT_REACH, "undefined get_Sym_Entry method called for an ast_Node Object")
 }
 
+value_Type num_Ast::get_Val_Type()
+{
+	CHECK_INVARIANT(false, "get_Val_Type() cannot be called for this node")
+}
+
+string num_Ast::get_Name()
+{
+	CHECK_INVARIANT(SHOULD_NOT_REACH, "get_Name() cannot be called for this node")
+}
 
 /* new crude implementation */
 //-----------------------------------------------------------

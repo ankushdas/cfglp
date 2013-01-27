@@ -455,7 +455,7 @@ expr :
  |  I_NUM[num]
 	{
 	    //nothing to check
-	    $$ = new num_Ast($num);
+	    $$ = new int_num_Ast($num);
 	}
  |  D_NUM[num]
 	{

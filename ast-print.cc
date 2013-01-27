@@ -41,6 +41,11 @@ using namespace std;
 
 /************* Methods for class asgn_Ast ******************/
 
+void num_Ast::print_Node(ostream* o)
+{
+	CHECK_INVARIANT(false, "print_Node() called on wrong node")
+}
+
 void asgn_Ast::print_Node(ostream * asgn_fp)
 {
     *asgn_fp << " Asgn: (LHS ";
@@ -55,7 +60,7 @@ void name_Ast::print_Node(ostream * name_fp)
     *name_fp << "(Name:(" << name << "))";
 }
 
-void num_Ast::print_Node(ostream * num_fp)
+void int_num_Ast::print_Node(ostream * num_fp)
 {
     *num_fp << "(Num:(" << num << "))";
 }

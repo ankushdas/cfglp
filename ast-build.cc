@@ -39,14 +39,10 @@ using namespace std;
 */
 
 
-int ast_Node::get_Num()
-{
-    CHECK_INVARIANT(SHOULD_NOT_REACH, "get_Num method cannot be called for a non-num ast node")
-}
 
-double ast_Node::get_d_Num()
+eval_Result num_Ast::evaluate()
 {
-    CHECK_INVARIANT(SHOULD_NOT_REACH, "get_Num method cannot be called for a non-num ast node")
+	CHECK_INVARIANT(false, "evaluate() called on wrong node")
 }
 
 
@@ -93,17 +89,13 @@ sym_Entry_Ptr name_Ast::get_Sym_Entry()
 
 /************* Methods for class num_Ast ******************/
 
-num_Ast::num_Ast(int n)
+int_num_Ast::int_num_Ast(int n)
 {
     t_op = num_Leaf;
     num = n;
     node_arity = zero_Arity;
 }
 
-int num_Ast::get_Num()
-{
-    return num;
-}
 
 /************* Methods for class ret_Ast ******************/
 
@@ -178,10 +170,6 @@ float_num_Ast::float_num_Ast(double n)
     node_arity = zero_Arity;
 }
 
-double float_num_Ast::get_d_Num()
-{
-    return num;
-}
 
 
 /************* Methods for class mult_Ast ******************/

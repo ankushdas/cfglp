@@ -61,7 +61,7 @@ eval_Result name_Ast::evaluate()
     return this->get_Value_of_Evaluation();
 }
 
-eval_Result num_Ast::evaluate()
+eval_Result int_num_Ast::evaluate()
 {
     eval_Result res(num, NULL, int_Res);
     return res;
