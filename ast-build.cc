@@ -139,6 +139,10 @@ ret_Ast::ret_Ast()
 //        sym_entry = s;
 //}
 
+void arith_Ast::print_Node(ostream* fp) {
+	CHECK_INVARIANT(false, "should not be called for arith_ast")
+}
+
 
 exp_var_Ast::exp_var_Ast(string n)
 {
@@ -253,39 +257,31 @@ uminus_Ast::uminus_Ast(ast_Ptr p)
     CHECK_INVARIANT(p != NULL, "Child of an uminus tree node cannot be NULL")
     //CHECK_INVARIANT(l->get_Tree_Op() != num_Leaf, "Left child of an assignment tree node cannot be a number")
     CHECK_INVARIANT(p->get_Tree_Op() != asgn, "Child cannot be an assignment node")
-    pt = p;
-    data_type = pt->get_Val_Type();
+    left = p;
+    right = NULL;
+    data_type = left->get_Val_Type();
 }
 
-ast_Ptr ast_Node::get_Left()
-{
-	CHECK_INVARIANT(false, "get_Left() cannot be called for this node")
-}
+//ast_Ptr ast_Node::get_Left()
+//{
+//	CHECK_INVARIANT(false, "get_Left() cannot be called for this node")
+//}
 
-ast_Ptr ast_Node::get_Right()
-{
-	CHECK_INVARIANT(false, "get_Right() cannot be called for this node")
-}
+//ast_Ptr ast_Node::get_Right()
+//{
+//	CHECK_INVARIANT(false, "get_Right() cannot be called for this node")
+//}
 
-ast_Ptr ast_Node::get_Pt()
-{
-	CHECK_INVARIANT(false, "get_Pt() cannot be called for this node")
-}
 
-void ast_Node::assign_Left(ast_Ptr a)
-{
-	CHECK_INVARIANT(false, "assign_Left() cannot be called for this node")
-}
+//void ast_Node::assign_Left(ast_Ptr a)
+//{
+//	CHECK_INVARIANT(false, "assign_Left() cannot be called for this node")
+//}
 
-void ast_Node::assign_Right(ast_Ptr a)
-{
-	CHECK_INVARIANT(false, "assign_Right() cannot be called for this node")
-}
-
-void ast_Node::assign_Pt(ast_Ptr a)
-{
-	CHECK_INVARIANT(false, "assign_Pt() cannot be called for this node")
-}
+//void ast_Node::assign_Right(ast_Ptr a)
+//{
+//	CHECK_INVARIANT(false, "assign_Right() cannot be called for this node")
+//}
 
 
 

@@ -69,13 +69,6 @@ class ast_Node
 
     virtual void print_Node(ostream *p) = 0;
     
-    virtual ast_Ptr get_Left();
-    virtual ast_Ptr get_Right();
-    virtual ast_Ptr get_Pt();
-    virtual void assign_Left(ast_Ptr a);
-    virtual void assign_Right(ast_Ptr a);
-    virtual void assign_Pt(ast_Ptr a);
-
     /* Type checking functions */
     virtual void type_Check() ; 
     virtual value_Type get_Val_Type() ; 
@@ -105,18 +98,18 @@ class asgn_Ast: public ast_Node
     ~asgn_Ast() {}
     asgn_Ast& operator=(const asgn_Ast& rhs);
     
-    ast_Ptr get_Left() { return left; }
-	ast_Ptr get_Right() { return right; }
-	
-	void assign_Left(ast_Ptr a)
-	{
-		left = a;
-	}
-	
-	void assign_Right(ast_Ptr a)
-	{
-		right = a;
-	}
+//    ast_Ptr get_Left() { return left; }
+//	ast_Ptr get_Right() { return right; }
+//	
+//	void assign_Left(ast_Ptr a)
+//	{
+//		left = a;
+//	}
+//	
+//	void assign_Right(ast_Ptr a)
+//	{
+//		right = a;
+//	}
 
 
     /* Type checking functions */
@@ -282,145 +275,80 @@ class float_num_Ast: public ast_Node
     void print_Node(ostream *p);
 };
 
-
-class mult_Ast: public ast_Node
+class arith_Ast: public ast_Node
 {
-    ast_Ptr left;
-    ast_Ptr right;
-    value_Type data_type;
+	public:
+	ast_Ptr left;
+	ast_Ptr right;
+	value_Type data_type;
+	
+	arith_Ast() {}
+	~arith_Ast() {}
+	
+//	ast_Ptr get_Left() { return left; }
+//	ast_Ptr get_Right() { return right; }
+//	
+//	
+//	void assign_Left(ast_Ptr a)
+//	{
+//		left = a;
+//	}
+//	
+//	void assign_Right(ast_Ptr a)
+//	{
+//		right = a;
+//	}
+	
+	value_Type get_Val_Type() { return data_type;}
+    virtual void print_Node(ostream* fp);
+    virtual eval_Result evaluate() { return dummy_result; }
+};
+
+class mult_Ast: public arith_Ast
+{
   public:
     mult_Ast(ast_Ptr l, ast_Ptr  r);
     ~mult_Ast() {}
     
-    ast_Ptr get_Left() { return left; }
-	ast_Ptr get_Right() { return right; }
-	
-	
-	void assign_Left(ast_Ptr a)
-	{
-		left = a;
-	}
-	
-	void assign_Right(ast_Ptr a)
-	{
-		right = a;
-	}
-    
-    /* type checking fuctions */
-    value_Type get_Val_Type();
-    
     void print_Node(ostream *p);
-    eval_Result evaluate();
+    /* type checking fuctions */
+    
 };
 
-class plus_Ast: public ast_Node
+class plus_Ast: public arith_Ast
 {
-    ast_Ptr left;
-    ast_Ptr right;
-    value_Type data_type;
   public:
     plus_Ast(ast_Ptr l, ast_Ptr  r);
     ~plus_Ast() {}
     
-    
-    ast_Ptr get_Left() { return left; }
-	ast_Ptr get_Right() { return right; }
-	
-	void assign_Left(ast_Ptr a)
-	{
-		left = a;
-	}
-	
-	void assign_Right(ast_Ptr a)
-	{
-		right = a;
-	}
-	
-    /* type checking fuctions */
-    value_Type get_Val_Type();
-    
     void print_Node(ostream *p);
-    eval_Result evaluate();
 };
 
-class minus_Ast: public ast_Node
+class minus_Ast: public arith_Ast
 {
-    ast_Ptr left;
-    ast_Ptr right;
-    value_Type data_type;
   public:
     minus_Ast(ast_Ptr l, ast_Ptr  r);
     ~minus_Ast() {}
     
-    ast_Ptr get_Left() { return left; }
-	ast_Ptr get_Right() { return right; }
-	
-	void assign_Left(ast_Ptr a)
-	{
-		left = a;
-	}
-	
-	void assign_Right(ast_Ptr a)
-	{
-		right = a;
-	}
-    
-    /* type checking fuctions */
-    value_Type get_Val_Type();
-    
     void print_Node(ostream *p);
-    eval_Result evaluate();
 };
 
-class div_Ast: public ast_Node
+class div_Ast: public arith_Ast
 {
-    ast_Ptr left;
-    ast_Ptr right;
-    value_Type data_type;
   public:
     div_Ast(ast_Ptr l, ast_Ptr  r);
     ~div_Ast() {}
     
-    ast_Ptr get_Left() { return left; }
-	ast_Ptr get_Right() { return right; }
-	
-	void assign_Left(ast_Ptr a)
-	{
-		left = a;
-	}
-	
-	void assign_Right(ast_Ptr a)
-	{
-		right = a;
-	}
-    
-    /* type checking fuctions */
-    value_Type get_Val_Type();
-    
     void print_Node(ostream *p);
-    eval_Result evaluate();
 };
 
-class uminus_Ast: public ast_Node
+class uminus_Ast: public arith_Ast
 {
-    ast_Ptr pt;
-    value_Type data_type;
   public:
     uminus_Ast(ast_Ptr p);
     ~uminus_Ast() {}
-    
-    ast_Ptr get_Pt() { return pt; }
-    
-    void assign_Pt(ast_Ptr a)
-    {
-    	pt = a;
-    }
-    
-    /* type checking fuctions */
-    value_Type get_Val_Type();
-    
-    void print_Node(ostream *p);
-    eval_Result evaluate();
+	
+	void print_Node(ostream *p);
 };
 
 

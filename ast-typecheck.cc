@@ -207,29 +207,3 @@ string float_num_Ast::get_Name()
     snum << num;
     return snum.str();
 }
-
-value_Type plus_Ast::get_Val_Type()
-{
-    return data_type;
-}
-
-value_Type minus_Ast::get_Val_Type()
-{
-    return data_type;
-}
-
-value_Type mult_Ast::get_Val_Type()
-{
-    return data_type;
-}
-
-value_Type div_Ast::get_Val_Type()
-{
-    return data_type;
-}
-
-value_Type uminus_Ast::get_Val_Type()
-{
-    return data_type;
-}
-

@@ -120,29 +120,3 @@ eval_Result float_num_Ast::evaluate()
 {
     return dummy_result;
 }
-
-eval_Result mult_Ast::evaluate()
-{
-	return dummy_result;
-}
-
-eval_Result plus_Ast::evaluate()
-{
-	return dummy_result;
-}
-
-eval_Result minus_Ast::evaluate()
-{
-	return dummy_result;
-}
-
-eval_Result div_Ast::evaluate()
-{
-	return dummy_result;
-}
-
-eval_Result uminus_Ast::evaluate()
-{
-	return dummy_result;
-}
-

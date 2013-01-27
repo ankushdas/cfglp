@@ -142,7 +142,7 @@ void div_Ast::print_Node(ostream * div_fp) {
 
 void uminus_Ast::print_Node(ostream * uminus_fp) {
     *uminus_fp<<"(UMINUS: (";
-    pt->print_Node(uminus_fp);
+    left->print_Node(uminus_fp);
     *uminus_fp<<"))";
 }
 
@@ -151,7 +151,7 @@ void uminus_Ast::print_Node(ostream * uminus_fp) {
 Expanding AST
 */
 
-
+/*
 void check_for_arti(ast_Ptr root)
 {
 	ast_Ptr ptr;
@@ -318,3 +318,4 @@ void clean_Ast_List(ast_List_Ptr alist)
 	
 	
 }
+*/
