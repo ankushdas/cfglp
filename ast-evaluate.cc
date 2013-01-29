@@ -67,6 +67,11 @@ eval_Result int_num_Ast::evaluate()
     return res;
 }
 
+eval_Result num_Ast::evaluate()
+{
+    CHECK_INVARIANT (false, "evaluate cannot be called for num_Ast")
+}
+
 eval_Result ret_Ast::evaluate()
 {
     /* 
@@ -98,25 +103,115 @@ void ast_Node::set_Value_of_Evaluation(eval_Result res)
 {
     CHECK_INVARIANT(SHOULD_NOT_REACH, "set_Value_of_Evaluation cannot be called on a non-name-Ast")
 }
-/* new crude implementation */
-//-----------------------------------------------------------
-//-----------------------------------------------------------
-//-----------------------------------------------------------
-//-----------------------------------------------------------
-//-----------------------------------------------------------
-//-----------------------------------------------------------
 
-//eval_Result arti_var_Ast::evaluate() 
-//{
-//    return dummy_result;
-//}
+
+eval_Result arith_Ast::evaluate()
+{
+    CHECK_INVARIANT(false, "should not be called for arith_Ast class")
+}
 
 eval_Result exp_var_Ast::evaluate() 
 {
+    CHECK_INVARIANT(SHOULD_NOT_REACH, "evaluate for exp var called")
     return dummy_result;
 }
 
 eval_Result float_num_Ast::evaluate()
 {
-    return dummy_result;
+    eval_Result res(num, NULL, float_Res);
+    return res;
 }
+
+eval_Result mult_Ast::evaluate()
+{
+	eval_Result l_eval = left->evaluate();
+	eval_Result r_eval = right->evaluate();
+	CHECK_INVARIANT(l_eval.which_Result() == r_eval.which_Result(), "Type mismatch in * expression")
+	res_Type r = l_eval.which_Result();
+	float d_num;
+	int i_num;
+	if(r == float_Res) {
+	    d_num = l_eval.get_Float_Val() * r_eval.get_Float_Val();
+	    eval_Result res(d_num, NULL, float_Res);
+        return res;
+	} else {
+	    i_num = l_eval.get_Int_Val() * r_eval.get_Int_Val();
+	    eval_Result res(i_num, NULL, int_Res);
+        return res;
+	}    
+}
+
+eval_Result plus_Ast::evaluate()
+{
+	eval_Result l_eval = left->evaluate();
+	eval_Result r_eval = right->evaluate();
+	CHECK_INVARIANT(l_eval.which_Result() == r_eval.which_Result(), "Type mismatch in * expression")
+	res_Type r= l_eval.which_Result();
+	float d_num;
+	int i_num;
+	if(r == float_Res) {
+	    d_num = l_eval.get_Float_Val() + r_eval.get_Float_Val();
+	    eval_Result res(d_num, NULL, float_Res);
+        return res;
+	} else {
+	    i_num = l_eval.get_Int_Val() + r_eval.get_Int_Val();
+	    eval_Result res(i_num, NULL, int_Res);
+        return res;
+	}
+}
+
+eval_Result minus_Ast::evaluate()
+{
+	eval_Result l_eval = left->evaluate();
+	eval_Result r_eval = right->evaluate();
+	CHECK_INVARIANT(l_eval.which_Result() == r_eval.which_Result(), "Type mismatch in * expression")
+	res_Type r = l_eval.which_Result();
+	float d_num;
+	int i_num;
+	if(r == float_Res) {
+	    d_num = l_eval.get_Float_Val() - r_eval.get_Float_Val();
+	    eval_Result res(d_num, NULL, float_Res);
+        return res;
+	} else {
+	    i_num = l_eval.get_Int_Val() - r_eval.get_Int_Val();
+	    eval_Result res(i_num, NULL, int_Res);
+        return res;
+	}
+}
+
+eval_Result div_Ast::evaluate()
+{
+	eval_Result l_eval = left->evaluate();
+	eval_Result r_eval = right->evaluate();
+	CHECK_INVARIANT(l_eval.which_Result() == r_eval.which_Result(), "Type mismatch in * expression")
+	res_Type r= l_eval.which_Result();
+	float d_num;
+	int i_num;
+	if(r == float_Res) {
+	    d_num = l_eval.get_Float_Val() / r_eval.get_Float_Val();
+	    eval_Result res(d_num, NULL, float_Res);
+        return res;
+	} else {
+	    i_num = l_eval.get_Int_Val() / r_eval.get_Int_Val();
+	    eval_Result res(i_num, NULL, int_Res);
+        return res;
+	}
+}
+
+eval_Result uminus_Ast::evaluate()
+{
+	eval_Result l_eval = left->evaluate();
+	res_Type r = l_eval.which_Result();
+	float d_num;
+	int i_num;
+	if(r == float_Res) {
+	    d_num =  -1.0 * l_eval.get_Float_Val();
+	    eval_Result res(d_num, NULL, float_Res);
+        return res;
+	} else {
+	    i_num = -1 * l_eval.get_Int_Val();
+	    eval_Result res(i_num, NULL, int_Res);
+        return res;
+	}
+}
+

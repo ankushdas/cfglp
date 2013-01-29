@@ -39,13 +39,6 @@ using namespace std;
 */
 
 
-
-eval_Result num_Ast::evaluate()
-{
-	CHECK_INVARIANT(false, "evaluate() called on wrong node")
-}
-
-
 /************* Methods for class asgn_Ast ******************/
 
 asgn_Ast::asgn_Ast(ast_Ptr  l, ast_Ptr  r, int line)
@@ -87,7 +80,7 @@ sym_Entry_Ptr name_Ast::get_Sym_Entry()
         return sym_entry;
 }
 
-/************* Methods for class num_Ast ******************/
+/************* Methods for class int_num_Ast ******************/
 
 int_num_Ast::int_num_Ast(int n)
 {
@@ -96,7 +89,6 @@ int_num_Ast::int_num_Ast(int n)
     node_arity = zero_Arity;
 }
 
-
 /************* Methods for class ret_Ast ******************/
 
 ret_Ast::ret_Ast() 
@@ -104,37 +96,6 @@ ret_Ast::ret_Ast()
     t_op = ret;
     node_arity = zero_Arity;
 }
-
-
-/* new crude implementation */
-//-----------------------------------------------------------
-//-----------------------------------------------------------
-//-----------------------------------------------------------
-//-----------------------------------------------------------
-//-----------------------------------------------------------
-//-----------------------------------------------------------
-
-/************* Methods for class arti_name_Ast ******************/
-//arti_var_Ast::arti_var_Ast(string n)
-//{
-//        t_op = arti_var_Leaf;
-//        name = n;
-//        node_arity = zero_Arity;
-//        sym_entry = symtab_in_scope_P->get_Sym_Entry(n);
-//}
-
-//arti_var_Ast::arti_var_Ast(string n, sym_Entry_Ptr s)
-//{
-//        t_op = arti_var_Leaf;
-//        name = n;
-//        node_arity = zero_Arity;
-//        sym_entry = s;
-//}
-
-void arith_Ast::print_Node(ostream* fp) {
-	CHECK_INVARIANT(false, "should not be called for arith_ast")
-}
-
 
 exp_var_Ast::exp_var_Ast(string n)
 {
@@ -152,11 +113,6 @@ exp_var_Ast::exp_var_Ast(string n, sym_Entry_Ptr s)
         sym_entry = s;
 }
 
-//sym_Entry_Ptr arti_var_Ast::get_Sym_Entry()
-//{
-//        return sym_entry;
-//}
-
 sym_Entry_Ptr exp_var_Ast::get_Sym_Entry()
 {
         return sym_entry;
@@ -169,7 +125,6 @@ float_num_Ast::float_num_Ast(double n)
     num = n;
     node_arity = zero_Arity;
 }
-
 
 
 /************* Methods for class mult_Ast ******************/
@@ -249,27 +204,4 @@ uminus_Ast::uminus_Ast(ast_Ptr p)
     right = NULL;
     data_type = left->get_Val_Type();
 }
-
-//ast_Ptr ast_Node::get_Left()
-//{
-//	CHECK_INVARIANT(false, "get_Left() cannot be called for this node")
-//}
-
-//ast_Ptr ast_Node::get_Right()
-//{
-//	CHECK_INVARIANT(false, "get_Right() cannot be called for this node")
-//}
-
-
-//void ast_Node::assign_Left(ast_Ptr a)
-//{
-//	CHECK_INVARIANT(false, "assign_Left() cannot be called for this node")
-//}
-
-//void ast_Node::assign_Right(ast_Ptr a)
-//{
-//	CHECK_INVARIANT(false, "assign_Right() cannot be called for this node")
-//}
-
-
 

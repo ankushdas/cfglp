@@ -74,9 +74,7 @@ class ast_Node
     virtual value_Type get_Val_Type() ; 
     virtual entity_Type get_Entity_Type(); 
     virtual string get_Name() ; 
-//    virtual int get_Num();
-//    virtual double get_d_Num();
-
+    
     /* Evaluation functions */
     virtual eval_Result evaluate() = 0;
     virtual eval_Result get_Value_of_Evaluation();
@@ -97,20 +95,6 @@ class asgn_Ast: public ast_Node
     asgn_Ast(ast_Ptr l, ast_Ptr  r, int line);
     ~asgn_Ast() {}
     asgn_Ast& operator=(const asgn_Ast& rhs);
-    
-//    ast_Ptr get_Left() { return left; }
-//	ast_Ptr get_Right() { return right; }
-//	
-//	void assign_Left(ast_Ptr a)
-//	{
-//		left = a;
-//	}
-//	
-//	void assign_Right(ast_Ptr a)
-//	{
-//		right = a;
-//	}
-
 
     /* Type checking functions */
     void type_Check();
@@ -164,7 +148,6 @@ class num_Ast: public ast_Node
 	virtual value_Type get_Val_Type();
     virtual string get_Name();
     virtual eval_Result evaluate();
-    
     virtual void print_Node(ostream* o);
 
 };
@@ -225,45 +208,6 @@ class ret_Ast: public ast_Node
     void print_Node(ostream *p);
 };
 
-/* new crude implementation */
-//-----------------------------------------------------------
-//-----------------------------------------------------------
-//-----------------------------------------------------------
-//-----------------------------------------------------------
-//-----------------------------------------------------------
-//-----------------------------------------------------------
-
-
-//class arti_var_Ast: public ast_Node
-//{
-//    string name;
-//    sym_Entry_Ptr sym_entry;
-
-//  public:
-//    arti_var_Ast(string n);
-//    arti_var_Ast(string n, sym_Entry_Ptr s);
-//    ~arti_var_Ast() {}
-
-//    /* Common function required for many activities */
-//    sym_Entry_Ptr get_Sym_Entry();
-//    string get_Name();
-
-//    /* Type checking functions */
-//    value_Type get_Val_Type();
-//    entity_Type get_Entity_Type();
-
-//    /* Evaluation functions */
-//    eval_Result evaluate();
-//    //eval_Result get_Value_of_Evaluation();
-//    //void set_Value_of_Evaluation(eval_Result res);
-
-//    /* Other printing functions */
-//    void print_Node(ostream *p);
-//};
-
-
-
-
 class exp_var_Ast: public ast_Node
 {
     string name;
@@ -302,23 +246,9 @@ class arith_Ast: public ast_Node
 	arith_Ast() {}
 	~arith_Ast() {}
 	
-//	ast_Ptr get_Left() { return left; }
-//	ast_Ptr get_Right() { return right; }
-//	
-//	
-//	void assign_Left(ast_Ptr a)
-//	{
-//		left = a;
-//	}
-//	
-//	void assign_Right(ast_Ptr a)
-//	{
-//		right = a;
-//	}
-	
 	value_Type get_Val_Type() { return data_type;}
     virtual void print_Node(ostream* fp);
-    virtual eval_Result evaluate() { return dummy_result; }
+    virtual eval_Result evaluate();
 };
 
 class mult_Ast: public arith_Ast
@@ -328,8 +258,7 @@ class mult_Ast: public arith_Ast
     ~mult_Ast() {}
     
     void print_Node(ostream *p);
-    /* type checking fuctions */
-    
+    eval_Result evaluate();
 };
 
 class plus_Ast: public arith_Ast
@@ -339,6 +268,7 @@ class plus_Ast: public arith_Ast
     ~plus_Ast() {}
     
     void print_Node(ostream *p);
+    eval_Result evaluate();
 };
 
 class minus_Ast: public arith_Ast
@@ -348,6 +278,7 @@ class minus_Ast: public arith_Ast
     ~minus_Ast() {}
     
     void print_Node(ostream *p);
+    eval_Result evaluate();
 };
 
 class div_Ast: public arith_Ast
@@ -357,6 +288,7 @@ class div_Ast: public arith_Ast
     ~div_Ast() {}
     
     void print_Node(ostream *p);
+    eval_Result evaluate();
 };
 
 class uminus_Ast: public arith_Ast
@@ -366,6 +298,6 @@ class uminus_Ast: public arith_Ast
     ~uminus_Ast() {}
 	
 	void print_Node(ostream *p);
+	eval_Result evaluate();
 };
-
 

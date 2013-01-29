@@ -1,4 +1,4 @@
-//note: possible pains in entity_Type
+
 /*********************************************************************************************
 
                                 cfglp : A CFG Language Processor
@@ -82,8 +82,8 @@ class sym_Entry
     virtual void set_Sym_Entry_Ptr(ast_Ptr p);
 
     /* Functions required for evaluation */
-    virtual void set_Value(int num) ;
-    virtual int get_Value() ;
+    //virtual void set_Value(int num) ;
+    //virtual int get_Value() ;
     virtual void set_Value_of_Evaluation(eval_Result res) ;
     virtual eval_Result get_Value_of_Evaluation() ;
     virtual void print_Sym_Entry_Eval_Details(ostream * sym_fp) {}
@@ -102,121 +102,105 @@ class sym_Entry
 
 };
 
-class sym_Entry_for_Int_Var : public sym_Entry
+class sym_Entry_for_Var : public sym_Entry
 {
     /* data members required for compilation */
+    protected:
     int start_offset;    
     int end_offset;
     sym_Scope sym_scope;
     reg_Desc_Ptr reg_desc_ptr;
     var_Type var_t;
+    
+    /* data members required for evaluation */	          
+    bool undefined;   /* A local variable gets defined when a value is assigned to it */
     ast_Ptr sym_entry_ptr_sym;
 
-    /* data members required for evaluation */
-    int value;	          
-    bool undefined;   /* A local variable gets defined when a value is assigned to it */
+    public:
+    sym_Entry_for_Var() {}
+    ~sym_Entry_for_Var() {}
+    
+    ast_Ptr get_Sym_Entry_Ptr() { return sym_entry_ptr_sym; }
+    void set_Sym_Entry_Ptr(ast_Ptr p)
+    {
+    	sym_entry_ptr_sym = p;
+    }
+    
+    value_Type get_Value_Type();
+    entity_Type get_Entity_Type();
+    var_Type get_Var_Type();
+    
+    /* Functions required for compilation */
+    void set_Start_Offset(int num);
+    int get_Start_Offset();
+    void set_Reg(reg_Desc_Ptr reg_desc_ptr);
+    reg_Desc_Ptr get_Reg();
+    int get_End_Offset();
+    void set_End_Offset(int num);
+    sym_Scope get_Sym_Scope();
+    
+    bool is_Undefined();            
+    void reset_Undefined_Status();
+        
+    virtual void set_Value_of_Evaluation(eval_Result res);
+    virtual eval_Result get_Value_of_Evaluation();
+    
+    virtual void print_Sym_Entry_Eval_Details(ostream * sym_fp);
+
+    /* General dump functions */
+    virtual void print_Sym_Entry_Details(ostream *p);
+    
+};
+
+
+class sym_Entry_for_Int_Var : public sym_Entry_for_Var
+{
+    int value;
 
   public:
     sym_Entry_for_Int_Var(string name, int line, var_Type v);
     ~sym_Entry_for_Int_Var() {}
     
-    ast_Ptr get_Sym_Entry_Ptr() { return sym_entry_ptr_sym; }
-    
-    void set_Sym_Entry_Ptr(ast_Ptr p)
-    {
-    	sym_entry_ptr_sym = p;
-    }
-
-    value_Type get_Value_Type();
-    entity_Type get_Entity_Type();
-    var_Type get_Var_Type();
-
-    /* Functions required for compilation */
-    void set_Start_Offset(int num);
-    int get_Start_Offset();
-
-    void set_Reg(reg_Desc_Ptr reg_desc_ptr);
-    reg_Desc_Ptr get_Reg();
-
-    int get_End_Offset();
-    void set_End_Offset(int num);
-
-    sym_Scope get_Sym_Scope();
-
-    void print_Sym_for_Assembly(ostream * sym_fp);
-
     /* Functions required for evaluation */
     void set_Value(int num);
     int get_Value();
-
-    bool is_Undefined();            
-    void reset_Undefined_Status();
-
     void set_Value_of_Evaluation(eval_Result res);
     eval_Result get_Value_of_Evaluation();
-
+    
+    void print_Sym_for_Assembly(ostream * sym_fp);
+    
     void print_Sym_Entry_Eval_Details(ostream * sym_fp);
 
     /* General dump functions */
     void print_Sym_Entry_Details(ostream *p);
-
+    
 
 };
 
-class sym_Entry_for_Float_Var : public sym_Entry
+class sym_Entry_for_Float_Var : public sym_Entry_for_Var
 {
     /* data members required for compilation */
-    int start_offset;    
-    int end_offset;
-    sym_Scope sym_scope;
-    reg_Desc_Ptr reg_desc_ptr;
-    var_Type var_t;
-    ast_Ptr sym_entry_ptr_sym;
+    
     
     /* data members required for evaluation */
     double value;	          
-    bool undefined;   /* A local variable gets defined when a value is assigned to it */
 
   public:
     sym_Entry_for_Float_Var(string name, int line, var_Type v);
     ~sym_Entry_for_Float_Var() {}
     
-    ast_Ptr get_Sym_Entry_Ptr() { return sym_entry_ptr_sym; }
     
-    void set_Sym_Entry_Ptr(ast_Ptr p)
-    {
-    	sym_entry_ptr_sym = p;
-    }
-
-    value_Type get_Value_Type();
-    entity_Type get_Entity_Type();
-    var_Type get_Var_Type();
-    
-    /* Functions required for compilation */
-    void set_Start_Offset(int num);
-    int get_Start_Offset();
-
-    void set_Reg(reg_Desc_Ptr reg_desc_ptr);
-    reg_Desc_Ptr get_Reg();
-
-    int get_End_Offset();
-    void set_End_Offset(int num);
-
-    sym_Scope get_Sym_Scope();
 
     //void print_Sym_for_Assembly(ostream * sym_fp);
 
     /* Functions required for evaluation */
-    void set_Value(int num);
-    int get_Value();
+    void set_Value(double num);
+    double get_Value();
 
-    bool is_Undefined();            
-    void reset_Undefined_Status();
+    void set_Value_of_Evaluation(eval_Result res);
+    eval_Result get_Value_of_Evaluation();
 
-    //void set_Value_of_Evaluation(eval_Result res);
-    //eval_Result get_Value_of_Evaluation();
-
-    //void print_Sym_Entry_Eval_Details(ostream * sym_fp);
+    void print_Sym_Entry_Eval_Details(ostream * sym_fp);
 
     /* General dump functions */
     void print_Sym_Entry_Details(ostream *p);
@@ -264,6 +248,10 @@ class sym_List
     /* Functions required for evaluation */
     void set_Int_Val (string name, int value);
     int get_Int_Val (string name);
+    
+    void set_Float_Val (string name, double value);
+    double get_Float_Val (string name);
+    
     void print_Sym_Node_List_for_Evaluation(ostream * sym_fp);
 
     /* Functions required for compilation */
