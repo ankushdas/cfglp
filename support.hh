@@ -30,6 +30,7 @@ bool error_Status ();
 void report_Violation_and_Abort(bool b, string s);
 string get_Var_Name(string arti_var);
 
+
 #define CHECK_INVARIANT(x,y) \
      {  stringstream ___new___string___; \
         ___new___string___ << y << " (Invariant at line " << __LINE__ <<  ", file " << __FILE__ << ").\n"; \

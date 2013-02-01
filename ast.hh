@@ -47,6 +47,23 @@ using namespace std;
    file ast.cc.
 */
 
+struct bb_with_exe
+{
+	int bb_n;
+	ast_List_Ptr bb_stmt_list;
+	ast_Ptr bb_if_else;
+	
+	bb_with_exe(int num, ast_List_Ptr bb, ast_Ptr bb_if)
+	{
+		bb_n = num;
+		bb_stmt_list = bb;
+		bb_if_else = bb_if;
+	}
+};
+
+typedef bb_with_exe* bb_Exe_Ptr;
+typedef list <bb_Exe_Ptr> * bb_Exe_List_Ptr;
+
 typedef enum {asgn, ret, name_Leaf, arti_var_Leaf, exp_var_Leaf, num_Leaf, plus_tree, mult_tree, minus_tree, divide_tree, uminus} ast_Op;
 typedef enum {zero_Arity=0, unary=1, binary=2} ast_Arity;   
 

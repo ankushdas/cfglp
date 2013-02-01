@@ -53,6 +53,8 @@ using namespace std;
 %parse-param { cfglp_ctx &ctx }
 %lex-param   { cfglp_ctx &ctx }
 
+
+
 %union 
 {
     int ival;
@@ -63,6 +65,7 @@ using namespace std;
     sym_Entry_Ptr sym_P;
     proc_Ptr proc_P;
     program_Ptr prog_P;
+    bb_Exe_List_Ptr bb_exe_L;
 };
 
 /* declare tokens */
@@ -71,19 +74,24 @@ using namespace std;
 %left '(' ')'
 %token <ival> I_NUM
 %token <fval> D_NUM
+%token <sval> BB_ID
 %token <sval> ID
 %token <sval> ARTIFICIAL_VAR
 %token <sval> EXP_VAR
-%token <sval> BB_ID
-%token INT RETURN STATIC FLOAT DOUBLE
+%token INT FLOAT DOUBLE RETURN STATIC IF ELSE GOTO
+%token <sval> COND_VAR
+%token <sval> RELOP
 
 %type <ast_P> exe_Stmt
 %type <ast_P> expr
+%type <ast_P> cond
+%type <ast_P> if_Stmt
 %type <ast_L> exe_Stmt_List
 %type <sym_P> decl_Stmt 
 %type <ival> bb_Decl
 %type <proc_P> procedure
 %type <prog_P> program
+%type <bb_exe_L> bb_Decl_List
 
 %{
   extern int yylex(yy::cfglp::semantic_type *yylval,
@@ -93,7 +101,7 @@ using namespace std;
 /* Some auxiliary local functions */
 
   static program_Ptr build_Program(proc_Ptr proc_P, sym_List_Ptr gsym_lp);
-  static proc_Ptr build_Procedure (string name, int bb_num, ast_List_Ptr ast_lp,  
+  static proc_Ptr build_Procedure (string name, bb_Exe_List_Ptr blp,  
                 sym_List_Ptr sym_lp, sym_List_Ptr sym_gp);
   static sym_Entry_Ptr redeclaration_Error(string name);
   static ast_Ptr missing_Declaration_Error(bool lhs_d, string lhs_n, bool rhs_d, string rhs_n, int line);
@@ -199,20 +207,122 @@ procedure:
             redeclaration_Error(name);
         symtab_in_scope_P->allocate_Sym_List(); 
     }
-    '(' ')' '{' decl_Stmt_List bb_Decl[bbn] exe_Stmt_List[slist] '}'
+    '(' ')' '{' decl_Stmt_List bb_Decl_List[blist] '}'//bb_Decl[bbn] exe_Stmt_List[slist] '}'
     {
         string name = *$id;
         sym_List_Ptr sym_lp = symtab_in_scope_P->get_Symtab_Local_List(); 
         sym_List_Ptr sym_gp = symtab_in_scope_P->get_Symtab_Global_List(); 
-        int bb_num = $bbn;
-        ast_List_Ptr ast_lp = $slist;
-        $$ = build_Procedure (name, bb_num, ast_lp, sym_lp, sym_gp);
+        //int bb_num = $bbn;
+        //ast_List_Ptr ast_lp = $slist;
+        $$ = build_Procedure (name, $blist, sym_lp, sym_gp);
         symtab_in_scope_P->deallocate_Sym_List(); 
     }
  ;
 
-exe_Stmt_List:   
-    exe_Stmt_List[list] exe_Stmt[item] 
+bb_Decl_List:
+	bb_Decl_List[blist] bb_Decl[num] exe_Stmt_List[item] if_Stmt[f_item]
+	{
+		if ($blist && $num)
+		{
+			bb_Exe_List_Ptr belp = $blist;
+			bb_Exe_Ptr bep = new bb_with_exe($num,$item,$f_item);
+			belp->push_back(bep);
+			$$ = belp;
+		}
+		else if ($blist && !$num)
+		{
+			$$ = $blist;
+		}
+		else if (!$blist && $num)
+		{
+			bb_Exe_List_Ptr belp = new list <bb_Exe_Ptr>;
+			bb_Exe_Ptr bep = new bb_with_exe($num,$item,$f_item);
+			belp->push_back(bep);
+			$$ = belp;
+		}
+		else $$ = NULL;
+	}
+ |	bb_Decl_List[blist] bb_Decl[num] exe_Stmt_List[item]
+	{
+		if ($blist && $num && $item)
+		{
+			bb_Exe_List_Ptr belp = $blist;
+			bb_Exe_Ptr bep = new bb_with_exe($num,$item,NULL);
+			belp->push_back(bep);
+			$$ = belp;
+		}
+		else if ($blist && !$num && !$item)
+		{
+			$$ = $blist;
+		}
+		else if (!$blist && $num && $item)
+		{
+			bb_Exe_List_Ptr belp = new list <bb_Exe_Ptr>;
+			bb_Exe_Ptr bep = new bb_with_exe($num,$item,NULL);
+			belp->push_back(bep);
+			$$ = belp;
+		}
+		else $$ = NULL;
+	}
+ |	bb_Decl_List[blist] bb_Decl[num] if_Stmt[f_item]
+	{
+		if ($blist && $num && $f_item)
+		{
+			bb_Exe_List_Ptr belp = $blist;
+			bb_Exe_Ptr bep = new bb_with_exe($num,NULL,$f_item);
+			belp->push_back(bep);
+			$$ = belp;
+		}
+		else if ($blist && !$num && !$f_item)
+		{
+			$$ = $blist;
+		}
+		else if (!$blist && $num && $f_item)
+		{
+			bb_Exe_List_Ptr belp = new list <bb_Exe_Ptr>;
+			bb_Exe_Ptr bep = new bb_with_exe($num,NULL,$f_item);
+			belp->push_back(bep);
+			$$ = belp;
+		}
+		else $$ = NULL;
+	}
+ |	bb_Decl[bbn] exe_Stmt_List[slist] if_Stmt[f_item]
+	{
+		if ($bbn && $slist && $f_item)
+		{
+			bb_Exe_List_Ptr belp = new list <bb_Exe_Ptr>;
+			bb_Exe_Ptr bep = new bb_with_exe($bbn,$slist,$f_item);
+			belp->push_back(bep);
+			$$ = belp;
+		}
+		else $$ = NULL;
+	}
+ |	bb_Decl[bbn] exe_Stmt_List[slist]
+ 	{
+ 		if ($bbn && $slist)
+		{
+			bb_Exe_List_Ptr belp = new list <bb_Exe_Ptr>;
+			bb_Exe_Ptr bep = new bb_with_exe($bbn,$slist,NULL);
+			belp->push_back(bep);
+			$$ = belp;
+		}
+		else $$ = NULL;
+	}
+ |	bb_Decl[bbn] if_Stmt[f_item]
+ 	{
+ 		if ($bbn && $f_item)
+		{
+			bb_Exe_List_Ptr belp = new list <bb_Exe_Ptr>;
+			bb_Exe_Ptr bep = new bb_with_exe($bbn,NULL,$f_item);
+			belp->push_back(bep);
+			$$ = belp;
+		}
+		else $$ = NULL;
+	}
+ ;
+
+exe_Stmt_List:
+	exe_Stmt_List[list] exe_Stmt[item] 
     {
         if ($list && $item)
         {
@@ -352,7 +462,36 @@ decl_Stmt:
         else
             $$ = redeclaration_Error(name);
     }
+
+
+ |  static_kw INT COND_VAR[id] ';'
+    {
+    	/*
+        string name = *$id;
+        if (symtab_in_scope_P->declared_In_Visible_Scope(name, symtab_Top) == false)
+        {
+            sym_List_Ptr gl = symtab_in_scope_P->get_Symtab_Global_List();
+            sym_Entry_Ptr s = new sym_Entry_for_Int_Var(name, yylineno, exp);
+            $$ = s;    
+        }
+        else
+            $$ = redeclaration_Error(name);
+        */
+    }
     
+  | static_kw DECIMALS COND_VAR[id] ';'
+    {
+    	/*
+    	string name = *$id;
+        if (symtab_in_scope_P->declared_In_Visible_Scope(name, symtab_Top) == false)
+        {
+            sym_Entry_Ptr s = new sym_Entry_for_Float_Var(name, yylineno, exp);
+            $$ = s;
+        }
+        else
+            $$ = redeclaration_Error(name);
+        */
+    }
  ;
 
 static_kw:  /* empty */
@@ -379,14 +518,13 @@ DECIMALS:
 ;
 
 exe_Stmt : 
-     
-    ID[lhs] '=' expr[rhs] ';'
+	ID[lhs] '=' expr[rhs] ';'
  	{
  		/* things to check:
  		1. lhs has been declared or not
  		2. lhs-rhs type matches or not
  		*/
- 		$$ = process_Asgn_Name_Expr(*$lhs, $rhs, yylineno, 0);
+ 		//$$ = process_Asgn_Name_Expr(*$lhs, $rhs, yylineno, 0);
  	}
  |  ARTIFICIAL_VAR[lhs] '=' expr[rhs] ';'
  	{
@@ -394,7 +532,7 @@ exe_Stmt :
  		1. lhs has been declared or not  
  		2. lhs-rhs type matches or not
  		*/
- 		$$ = process_Asgn_Name_Expr(get_Var_Name(*$lhs), $rhs, yylineno, 0);
+ 		//$$ = process_Asgn_Name_Expr(get_Var_Name(*$lhs), $rhs, yylineno, 0);
  	}	
  |  EXP_VAR[lhs] '=' expr[rhs] ';'
  	{
@@ -402,14 +540,39 @@ exe_Stmt :
  		1. lhs has been declared or not  
  		2. lhs-rhs type matches or not
  		*/
- 		$$ = process_Asgn_Name_Expr(*$lhs, $rhs, yylineno, 1);
- 	}	
+ 		//$$ = process_Asgn_Name_Expr(*$lhs, $rhs, yylineno, 1);
+ 	}
+ |	COND_VAR[lhs] '=' expr[rhs] ';'
+ 	{
+ 		$$ = NULL;
+ 	}
  |  RETURN ';' 
     {
         $$ = new ret_Ast();
     }
  ;
- 
+
+if_Stmt:
+	IF '(' cond[condition] ')' GOTO BB_ID[id] ';' ELSE GOTO BB_ID[id] ';'
+ 	{
+ 		//cout<<"IF"<<endl;
+ 		$$ = NULL;
+ 	}
+ |  GOTO BB_ID[id] ';'
+ 	{
+ 		//cout<<"GOTO"<<endl;
+ 		$$ = NULL;
+ 	}
+ ;
+
+cond:
+	expr[lhs] RELOP expr[rhs]
+	{
+		//cout<<"COND"<<endl;
+		$$ = NULL;
+	}
+ ;
+
 expr :
 	ID[id]
 	{
@@ -425,7 +588,11 @@ expr :
  	{
         //things to check: extra_var declared or not
         $$ = process_Expr_equals_Id(*$id, 1, yylineno);
- 	}	
+ 	}
+ |	COND_VAR[id]
+ 	{
+ 		$$ = NULL;
+ 	}
  |  I_NUM[num]
 	{
 	    //nothing to check
@@ -490,12 +657,45 @@ program_Ptr build_Program (proc_Ptr proc_P, sym_List_Ptr gsym_lp)
     return prog_P;
 }
 
-proc_Ptr build_Procedure (string name, int bb_num, ast_List_Ptr ast_lp,  sym_List_Ptr sym_lp, sym_List_Ptr sym_gp) 
+
+proc_Ptr build_Procedure (string name, bb_Exe_List_Ptr blp,  sym_List_Ptr sym_lp, sym_List_Ptr sym_gp) 
 {
      /*  
          We create a basic block and then add it to a list. In 
          this version the list contains a single basic block.
      */
+    
+	int bb_num; 
+	ast_List_Ptr aslp;
+	bb_Ptr bbp;
+	list<bb_Exe_Ptr>::iterator it;
+	bb_List_Ptr bblp = new list<bb_Ptr>;
+	for (it = blp->begin() ; it != blp->end() ; ++it)
+	{
+		bb_num = (*it)->bb_n;
+		aslp = (*it)->bb_stmt_list;
+		bbp = new basic_Block(bb_num, aslp);
+		bblp->push_back(bbp);
+	}
+
+     /*
+         Then we use the procedure name and declaration list to 
+         create a procedure object.
+     */ 
+    
+	proc_Ptr proc_P = new procedure (name, sym_lp, sym_gp, bblp);
+
+	return proc_P;
+}
+
+
+/*
+proc_Ptr build_Procedure (string name, int bb_num, ast_List_Ptr ast_lp,  sym_List_Ptr sym_lp, sym_List_Ptr sym_gp) 
+{
+     /*  
+         We create a basic block and then add it to a list. In 
+         this version the list contains a single basic block.
+     
 
      bb_Ptr bbp = new basic_Block(bb_num, ast_lp);
      bb_List_Ptr bblp = new list<bb_Ptr>;
@@ -504,13 +704,13 @@ proc_Ptr build_Procedure (string name, int bb_num, ast_List_Ptr ast_lp,  sym_Lis
      /*
          Then we use the procedure name and declaration list to 
          create a procedure object.
-     */ 
+     
     
      proc_Ptr proc_P = new procedure (name, sym_lp, sym_gp, bblp);
 
      return proc_P;
     }
-
+*/
 
 sym_Entry_Ptr redeclaration_Error(string name)
 {

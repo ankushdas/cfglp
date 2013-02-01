@@ -76,6 +76,7 @@ typedef yy::cfglp::token token;
 digit [0-9]
 letter [a-z_A-Z_] 
 operator [-+*/=]
+relational_operator ">"|"<"|">="|"<="|"=="|"!="
 
 %%
 
@@ -83,6 +84,12 @@ operator [-+*/=]
      // start where previous token ended
      yylloc->step ();
 %}
+
+{relational_operator} {
+				store_Token_Name ("RELOP");
+				yylval->sval = new std::string(yytext);
+				return token::RELOP;
+			}
 
 [<>:{}();] { 
                  store_Token_Name ("META CHAR");
@@ -136,11 +143,27 @@ return      {
                  store_Token_Name("RETURN");
                  return token::RETURN; 
             }
-
+			
 static      { 
                  store_Token_Name("STATIC");
                  return token::STATIC; 
             }
+
+if			{
+				store_Token_Name("IF");
+				return token::IF;
+			}
+			
+else		{
+				store_Token_Name("ELSE");
+				return token::ELSE;
+			}
+			
+goto		{
+				store_Token_Name("GOTO");
+				return token::GOTO;
+			}
+
 
 {letter}({letter}|{digit})* {
 
@@ -154,14 +177,18 @@ static      {
                   return token::EXP_VAR; 
              }
              
-             
+"iftmp"[.]{digit}+	{
+				store_Token_Name("COND_VAR");
+				yylval->sval = new std::string (yytext);
+				return token::COND_VAR;
+			}
+			
 {letter}({letter}|{digit})*[.]{digit}+ {
 
                  store_Token_Name("ARTIFICIAL_VAR");
                  yylval->sval = new std::string (yytext);
                  return token::ARTIFICIAL_VAR; 
              }
-
                        
 \n           { 
                  yylloc->lines(1); 
